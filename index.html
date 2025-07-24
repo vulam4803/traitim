@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Yêu Trang</title>
+  <style>
+    body {
+      margin: 0;
+      background: radial-gradient(circle, #111, #000);
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+    .heart-container {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      animation: float 4s ease-in-out infinite;
+    }
+    .heart {
+      width: 100px;
+      height: 90px;
+      background: linear-gradient(145deg, #ff4d4d, #cc0000);
+      box-shadow: 0 0 30px red, 0 0 60px crimson;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      animation: heartbeat 1s infinite;
+    }
+    .heart::before,
+    .heart::after {
+      content: "";
+      width: 100px;
+      height: 90px;
+      background: linear-gradient(145deg, #ff4d4d, #cc0000);
+      border-radius: 50%;
+      position: absolute;
+    }
+    .heart::before {
+      top: -50px;
+      left: 0;
+    }
+    .heart::after {
+      top: 0;
+      left: 50px;
+    }
+    .text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #fff;
+      font-weight: bold;
+      font-family: Arial, sans-serif;
+      font-size: 20px;
+      text-shadow: 0 0 5px #ffcccc, 0 0 10px #ff9999;
+      animation: glow 2s ease-in-out infinite;
+      white-space: nowrap;
+    }
+    .particle {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: radial-gradient(circle, pink, red);
+      border-radius: 50%;
+      animation: explode 1.8s ease-out forwards;
+      pointer-events: none;
+      opacity: 0.8;
+      filter: drop-shadow(0 0 5px white);
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: translate(-50%, -50%) rotate(-45deg) scale(1); }
+      25%, 60% { transform: translate(-50%, -50%) rotate(-45deg) scale(1.4); }
+    }
+    @keyframes glow {
+      0%, 100% { text-shadow: 0 0 5px #ffcccc, 0 0 10px #ff9999; }
+      50% { text-shadow: 0 0 10px #ffffff, 0 0 20px #ff4d4d; }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes explode {
+      0% { opacity: 1; transform: scale(1) translate(0, 0); }
+      100% { opacity: 0; transform: scale(2) translate(var(--x), var(--y)); }
+    }
+  </style>
+</head>
+<body>
+  <div class="heart-container">
+    <div class="heart" id="main-heart"></div>
+    <div class="text">Yêu Trang</div>
+  </div>
+  <script>
+    const container = document.querySelector('.heart-container');
+    function spawnParticles() {
+      for (let i = 0; i < 30; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 100 + Math.random() * 80;
+        p.style.setProperty('--x', `${Math.cos(angle)*radius}px`);
+        p.style.setProperty('--y', `${Math.sin(angle)*radius}px`);
+        p.style.left = '50%';
+        p.style.top = '50%';
+        container.appendChild(p);
+        setTimeout(() => p.remove(), 1800);
+      }
+    }
+    setInterval(spawnParticles, 800);
+  </script>
+</body>
+</html>
