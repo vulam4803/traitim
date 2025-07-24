@@ -11,34 +11,42 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      background: linear-gradient(45deg, #330000, #660033, #330033);
-      background-size: 600% 600%;
-      animation: gradientShift 10s ease infinite;
+      background: radial-gradient(circle at center, #1a1a1a, #000);
       overflow: hidden;
+      animation: bgShift 4s linear infinite;
+    }
+    @keyframes bgShift {
+      0% { background: radial-gradient(circle at center, #1a1a1a, #330000); }
+      25% { background: radial-gradient(circle at center, #330033, #000000); }
+      50% { background: radial-gradient(circle at center, #440000, #1a0000); }
+      75% { background: radial-gradient(circle at center, #330000, #330033); }
+      100% { background: radial-gradient(circle at center, #1a1a1a, #000); }
     }
     .heart-container {
       position: relative;
       width: 200px;
       height: 200px;
       animation: float 4s ease-in-out infinite;
+      cursor: pointer;
     }
     .heart {
       width: 100px;
       height: 90px;
-      background: linear-gradient(145deg, #ff4d4d, #cc0000);
-      box-shadow: 0 0 30px red, 0 0 60px crimson;
+      background: linear-gradient(45deg, #ff4d4d, #ff0066);
+      background-size: 400% 400%;
+      animation: heartColorShift 3s ease-in-out infinite, heartbeat 1.2s infinite;
+      box-shadow: 0 0 40px red, 0 0 80px crimson;
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%) rotate(-45deg);
-      animation: heartbeat 1s infinite;
     }
     .heart::before,
     .heart::after {
       content: "";
       width: 100px;
       height: 90px;
-      background: linear-gradient(145deg, #ff4d4d, #cc0000);
+      background: inherit;
       border-radius: 50%;
       position: absolute;
     }
@@ -58,27 +66,53 @@
       color: #fff;
       font-weight: bold;
       font-family: Arial, sans-serif;
-      font-size: 20px;
-      text-shadow: 0 0 5px #ffcccc, 0 0 10px #ff9999;
+      font-size: 22px;
+      text-shadow: 0 0 10px #fff, 0 0 20px #ff4d4d;
       white-space: nowrap;
-      animation: glow 2s ease-in-out infinite, fadeIn 3s ease-in-out forwards;
+      animation: glow 1.5s ease-in-out infinite, fadeIn 2s ease-in-out forwards;
       opacity: 0;
     }
     .particle {
       position: absolute;
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 24px;
       background: url('https://emoji.gg/assets/emoji/6500_heartspin.gif') no-repeat center/cover;
-      animation: explode 2s ease-out forwards;
+      animation: explode 1.5s ease-out forwards;
       pointer-events: none;
+    }
+    .sparkle {
+      position: absolute;
+      width: 5px;
+      height: 5px;
+      background: white;
+      border-radius: 50%;
+      animation: sparkle 0.8s ease-out forwards;
+      opacity: 0.8;
+    }
+    .firework {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: yellow;
+      animation: explode 0.6s ease-out forwards;
+    }
+    @keyframes sparkle {
+      from { transform: scale(0); opacity: 1; }
+      to { transform: scale(1.5); opacity: 0; }
     }
     @keyframes heartbeat {
       0%, 100% { transform: translate(-50%, -50%) rotate(-45deg) scale(1); }
       25%, 60% { transform: translate(-50%, -50%) rotate(-45deg) scale(1.4); }
     }
+    @keyframes heartColorShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
     @keyframes glow {
-      0%, 100% { text-shadow: 0 0 5px #ffcccc, 0 0 10px #ff9999; }
-      50% { text-shadow: 0 0 10px #ffffff, 0 0 20px #ff4d4d; }
+      0%, 100% { text-shadow: 0 0 10px #ffcccc, 0 0 20px #ff9999; }
+      50% { text-shadow: 0 0 20px #ffffff, 0 0 30px #ff4d4d; }
     }
     @keyframes float {
       0%, 100% { transform: translateY(0); }
@@ -92,25 +126,28 @@
       0% { opacity: 0; }
       100% { opacity: 1; }
     }
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
+    @keyframes fall {
+      to { transform: translateY(100vh); }
     }
   </style>
 </head>
 <body>
-  <div class="heart-container">
-    <div class="heart" id="main-heart"></div>
+  <audio autoplay loop hidden>
+    <source src="https://cdn.pixabay.com/audio/2023/03/06/audio_b2bd568047.mp3" type="audio/mpeg" />
+  </audio>
+  <div class="heart-container" id="heartContainer">
+    <div class="heart" id="mainHeart"></div>
     <div class="text">Yêu Trang</div>
   </div>
   <script>
-    const container = document.querySelector('.heart-container');
-    function spawnParticles() {
-      for (let i = 0; i < 30; i++) {
+    const container = document.getElementById('heartContainer');
+    const heart = document.getElementById('mainHeart');
+
+    function spawnParticles(count = 30) {
+      for (let i = 0; i < count; i++) {
         const p = document.createElement('div');
         p.className = 'particle';
-        const angle = Math.random() * Math.PI * 2;
+        const angle = Math.random() * 2 * Math.PI;
         const radius = 100 + Math.random() * 60;
         const x = Math.cos(angle) * radius;
         const y = Math.sin(angle) * radius;
@@ -119,10 +156,48 @@
         p.style.left = '50%';
         p.style.top = '50%';
         container.appendChild(p);
-        setTimeout(() => p.remove(), 2000);
+        setTimeout(() => p.remove(), 1500);
       }
     }
-    setInterval(spawnParticles, 700);
+
+    function spawnSparkles(count = 10) {
+      for (let i = 0; i < count; i++) {
+        const s = document.createElement('div');
+        s.className = 'sparkle';
+        s.style.left = Math.random() * 100 + '%';
+        s.style.top = Math.random() * 100 + '%';
+        container.appendChild(s);
+        setTimeout(() => s.remove(), 800);
+      }
+    }
+
+    function launchFirework() {
+      for (let i = 0; i < 20; i++) {
+        const f = document.createElement('div');
+        f.className = 'firework';
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 80 + Math.random() * 40;
+        const x = Math.cos(angle) * dist;
+        const y = Math.sin(angle) * dist;
+        f.style.setProperty('--x', `${x}px`);
+        f.style.setProperty('--y', `${y}px`);
+        f.style.left = '50%';
+        f.style.top = '50%';
+        container.appendChild(f);
+        setTimeout(() => f.remove(), 800);
+      }
+    }
+
+    container.addEventListener('click', () => {
+      spawnParticles(40);
+      spawnSparkles(12);
+      launchFirework();
+    });
+
+    setInterval(() => {
+      spawnParticles(20);
+      spawnSparkles(6);
+    }, 700);
 
     // Snowfall
     function createSnowflake() {
@@ -140,12 +215,7 @@
       document.body.appendChild(snowflake);
       setTimeout(() => snowflake.remove(), 6000);
     }
-    setInterval(createSnowflake, 200);
+    setInterval(createSnowflake, 120);
   </script>
-  <style>
-    @keyframes fall {
-      to { transform: translateY(100vh); }
-    }
-  </style>
 </body>
 </html>
